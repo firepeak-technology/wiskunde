@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import {
   ExerciseCardProperties,
   ExerciseCardEmits,
@@ -52,10 +52,13 @@ const answer = ref<number | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
 
 watch(
-  () => props.question,
-  () => {
-    answer.value = null;
-    inputRef.value?.focus();
+  () => props.phase,
+  async (newPhase) => {
+    if (newPhase === 'answering') {
+      answer.value = null;
+      await nextTick();
+      inputRef.value?.focus();
+    }
   },
 );
 

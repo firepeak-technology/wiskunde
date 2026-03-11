@@ -17,5 +17,16 @@ export function generateExercises(topicId: string, count: number): Exercise[] {
     throw new Error(`No generator found for topic: ${topicId}`);
   }
 
-  return Array.from({ length: count }, () => generator());
+  const exercises: Exercise[] = [];
+  const seen = new Set<string>();
+
+  while (exercises.length < count) {
+    const exercise = generator();
+    if (!seen.has(exercise.question)) {
+      seen.add(exercise.question);
+      exercises.push(exercise);
+    }
+  }
+
+  return exercises;
 }
