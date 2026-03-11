@@ -15,6 +15,12 @@
         @submit="onSubmit"
       />
 
+      <div v-if="phase !== 'summary'" class="text-center mt-6">
+        <button class="btn btn-outline btn-sm" @click="goHome">
+          Stoppen
+        </button>
+      </div>
+
       <ScoreSummary
         v-if="phase === 'summary'"
         :score="score"
@@ -56,11 +62,17 @@ const {
   score,
   total,
   submitAnswer,
+  pause,
   retry,
 } = useExerciseSession(level, topic);
 
 function onSubmit(answer: number) {
   givenAnswer.value = answer;
   submitAnswer();
+}
+
+function goHome() {
+  pause();
+  router.push('/');
 }
 </script>

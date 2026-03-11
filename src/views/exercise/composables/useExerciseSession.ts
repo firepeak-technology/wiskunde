@@ -6,15 +6,68 @@ import type { Exercise } from '@/generators/types';
 
 export type SessionPhase = 'answering' | 'feedback' | 'summary';
 
+type SavedSession = {
+  sessionId: string;
+  exercises: Exercise[];
+  currentIndex: number;
+  score: number;
+};
+
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function storageKey(level: string, topic: string, userName: string): string {
+  return `wiskunde-session-${level}-${topic}-${userName}`;
+}
+
+function loadSession(
+  level: string,
+  topic: string,
+  userName: string,
+): SavedSession | null {
+  const raw = localStorage.getItem(storageKey(level, topic, userName));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as SavedSession;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(
+  level: string,
+  topic: string,
+  userName: string,
+  data: SavedSession,
+): void {
+  localStorage.setItem(
+    storageKey(level, topic, userName),
+    JSON.stringify(data),
+  );
+}
+
+function clearSession(
+  level: string,
+  topic: string,
+  userName: string,
+): void {
+  localStorage.removeItem(storageKey(level, topic, userName));
+}
+
 export function useExerciseSession(level: string, topic: string) {
   const userStore = useUserStore();
-  const sessionId = ref(crypto.randomUUID());
-  const exercises = ref<Exercise[]>(generateExercises(topic, 10));
-  const currentIndex = ref(0);
+  const saved = loadSession(level, topic, userStore.name);
+
+  const sessionId = ref(saved?.sessionId ?? generateId());
+  const exercises = ref<Exercise[]>(
+    saved?.exercises ?? generateExercises(topic, 10),
+  );
+  const currentIndex = ref(saved?.currentIndex ?? 0);
   const phase = ref<SessionPhase>('answering');
   const givenAnswer = ref<number | null>(null);
   const isCorrect = ref(false);
-  const score = ref(0);
+  const score = ref(saved?.score ?? 0);
 
   const currentExercise = computed(() => exercises.value[currentIndex.value]);
   const total = computed(() => exercises.value.length);
@@ -49,13 +102,25 @@ export function useExerciseSession(level: string, topic: string) {
         currentIndex.value++;
         givenAnswer.value = null;
         phase.value = 'answering';
+        persistProgress();
       } else {
         finishSession();
       }
     }, 1500);
   }
 
+  function persistProgress() {
+    saveSession(level, topic, userStore.name, {
+      sessionId: sessionId.value,
+      exercises: exercises.value,
+      currentIndex: currentIndex.value,
+      score: score.value,
+    });
+  }
+
   async function finishSession() {
+    clearSession(level, topic, userStore.name);
+
     await db.sessionSummaries.add({
       sessionId: sessionId.value,
       level,
@@ -70,8 +135,13 @@ export function useExerciseSession(level: string, topic: string) {
     phase.value = 'summary';
   }
 
+  function pause() {
+    persistProgress();
+  }
+
   function retry() {
-    sessionId.value = crypto.randomUUID();
+    clearSession(level, topic, userStore.name);
+    sessionId.value = generateId();
     exercises.value = generateExercises(topic, 10);
     currentIndex.value = 0;
     phase.value = 'answering';
@@ -91,6 +161,7 @@ export function useExerciseSession(level: string, topic: string) {
     isCorrect,
     score,
     submitAnswer,
+    pause,
     retry,
   };
 }
