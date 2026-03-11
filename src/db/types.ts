@@ -20,4 +20,5 @@ export type SessionSummary = {
   score: number;
   total: number;
   date: string;
+  timestamp: number;
 };

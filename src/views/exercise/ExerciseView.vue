@@ -19,6 +19,8 @@
         v-if="phase === 'summary'"
         :score="score"
         :total="total"
+        :level="level"
+        :topic="topic"
         @retry="retry"
         @back="router.push(`/${level}`)"
       />

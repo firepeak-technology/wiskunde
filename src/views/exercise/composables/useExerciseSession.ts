@@ -64,6 +64,7 @@ export function useExerciseSession(level: string, topic: string) {
       score: score.value,
       total: total.value,
       date: new Date().toISOString().split('T')[0]!,
+      timestamp: Date.now(),
     });
 
     phase.value = 'summary';

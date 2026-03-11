@@ -8,7 +8,7 @@ const db = new Dexie('wiskunde-db') as Dexie & {
 
 db.version(1).stores({
   exerciseResults: '++id, sessionId, level, topic, userName, timestamp',
-  sessionSummaries: '++id, sessionId, level, topic, userName, date',
+  sessionSummaries: '++id, sessionId, level, topic, userName, date, timestamp',
 });
 
 export { db };
