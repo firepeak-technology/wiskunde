@@ -15,6 +15,18 @@ const router = createRouter({
       component: () => import('@/views/home/HomeView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/:level',
+      name: 'topics',
+      component: () => import('@/views/topics/TopicsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/:level/:topic',
+      name: 'exercise',
+      component: () => import('@/views/exercise/ExerciseView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 
