@@ -7,7 +7,7 @@
     }"
   >
     <div class="card-body items-center text-center gap-6">
-      <h2 class="text-5xl font-bold">{{ question }}</h2>
+      <h2 class="text-5xl font-bold whitespace-pre-line">{{ question }}</h2>
 
       <div v-if="phase === 'feedback' && !isCorrect" class="text-error text-lg">
         Juiste antwoord: {{ correctAnswer }}

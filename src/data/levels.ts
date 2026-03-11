@@ -33,7 +33,18 @@ export const levels: Level[] = [
     id: '3m',
     number: '3',
     suffix: 'de middelbaar',
-    topics: [],
+    topics: [
+      {
+        id: 'vergelijkingen',
+        label: 'Vergelijkingen',
+        description: 'Los vergelijkingen op naar x',
+      },
+      {
+        id: 'ongelijkheden',
+        label: 'Ongelijkheden',
+        description: 'Bepaal de grenswaarde bij ongelijkheden',
+      },
+    ],
   },
 ];
 
